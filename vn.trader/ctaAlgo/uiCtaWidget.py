@@ -1,6 +1,13 @@
 # encoding: UTF-8
 
 '''
+History
+<id>            <author>        <description>
+2017042100      hetajen         自动执行CTA策略
+
+'''
+
+'''
 CTA模块相关的GUI控制组件
 '''
 
@@ -162,9 +169,24 @@ class CtaEngineManager(QtGui.QWidget):
         self.registerEvent()
         
         # 记录日志
-        self.ctaEngine.writeCtaLog(u'CTA引擎启动成功')        
+        self.ctaEngine.writeCtaLog(u'CTA引擎启动成功')
+
+        '''2017042100 Add by hetajen begin'''
+        self.xh_startCta()
+        '''2017042100 Add by hetajen end'''
         
     #----------------------------------------------------------------------
+    '''2017042100 Add by hetajen begin'''
+    def xh_startCta(self):
+        self.load()
+        self.initAll()
+        self.startAll()
+
+    def xh_stopCta(self):
+        self.widgetDict['ctaM'].stopAll()
+        self.widgetDict['ctaM'].ctaEngine.savePosition()
+    '''2017042100 Add by hetajen end'''
+    # ----------------------------------------------------------------------
     def initUi(self):
         """初始化界面"""
         self.setWindowTitle(u'CTA策略')

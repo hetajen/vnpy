@@ -1,12 +1,5 @@
 # encoding: UTF-8
 
-'''
-History
-<id>            <author>        <description>
-2017041900      hetajen         开启软件后自动连接CTP和DB
-
-'''
-
 import sys
 import os
 import ctypes
@@ -55,19 +48,6 @@ def main():
     mainWindow = MainWindow(mainEngine, mainEngine.eventEngine)
     mainWindow.showMaximized()
 
-    '''2017041900 Add by hetajen begin'''
-    mainEngine.connect('CTP')
-    mainEngine.dbConnect()
-    mainWindow.openCta()
-    mainWindow.widgetDict['ctaM'].load()
-    mainWindow.widgetDict['ctaM'].initAll()
-    mainWindow.widgetDict['ctaM'].startAll()
-    if(True):
-        mainWindow.widgetDict['ctaM'].stopAll()
-
-    mainWindow.widgetDict['ctaM'].ctaEngine.savePosition()
-    '''2017041900 Add by hetajen end'''
-    
     # 在主线程中启动Qt事件循环
     sys.exit(app.exec_())
     

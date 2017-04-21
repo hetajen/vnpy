@@ -1,5 +1,12 @@
 # encoding: UTF-8
 
+'''
+History
+<id>            <author>        <description>
+2017042100      hetajen         自动执行CTA策略
+
+'''
+
 import psutil
 
 from uiBasicWidget import *
@@ -24,11 +31,15 @@ class MainWindow(QtGui.QMainWindow):
         
         self.initUi()
         self.loadWindowSettings('custom')
+
+        '''2017042100 Add by hetajen begin'''
+        self.openCta()
+        '''2017042100 Add by hetajen end'''
         
-    #----------------------------------------------------------------------
+    # ----------------------------------------------------------------------
     def initUi(self):
         """初始化界面"""
-        self.setWindowTitle('VnTrader')
+        self.setWindowTitle(u'星河')
         self.initCentral()
         self.initMenu()
         self.initStatusBar()

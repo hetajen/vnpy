@@ -1,5 +1,12 @@
 # encoding: UTF-8
 
+'''
+History
+<id>            <author>        <description>
+2017041900      hetajen         开启软件后自动连接CTP和DB
+
+'''
+
 import shelve
 from collections import OrderedDict
 from datetime import datetime
@@ -43,6 +50,11 @@ class MainEngine(object):
         self.ctaEngine = CtaEngine(self, self.eventEngine)
         self.drEngine = DrEngine(self, self.eventEngine)
         self.rmEngine = RmEngine(self, self.eventEngine)
+
+        '''2017041900 Add by hetajen begin'''
+        self.connect('CTP')
+        self.dbConnect()
+        '''2017041900 Add by hetajen end'''
         
     #----------------------------------------------------------------------
     def initGateway(self):
