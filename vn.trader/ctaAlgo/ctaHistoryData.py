@@ -7,6 +7,13 @@
 3. 增加从通达信导出的历史数据载入到MongoDB中的函数
 """
 
+'''
+History
+<id>            <author>        <description>
+2017042300      hetajen         新增：从sina财经json接口获取数据
+
+'''
+
 from datetime import datetime, timedelta
 import pymongo
 from time import time
@@ -16,7 +23,10 @@ from ctaBase import *
 from vtConstant import *
 from vtFunction import loadMongoSetting
 from datayesClient import DatayesClient
-
+'''2017042300 Add by hetajen begin'''
+import json
+import urllib
+'''2017042300 Add by hetajen end'''
 
 # 以下为vn.trader和通联数据规定的交易所代码映射 
 VT_TO_DATAYES_EXCHANGE = {}
@@ -315,12 +325,19 @@ class HistoryDataEngine(object):
 
 
 #----------------------------------------------------------------------
-def downloadEquityDailyBarts(self, symbol):
-        """
-        下载股票的日行情，symbol是股票代码
-        """
-        print u'开始下载%s日行情' %symbol
-        
+
+'''2017042300 Add by hetajen begin'''
+class HistoryDataEngine_SINA(object):
+    """CTA模块用的历史数据引擎"""
+    # ----------------------------------------------------------------------
+    def __init__(self):
+        """Constructor"""
+        host, port, logging = loadMongoSetting()
+        self.dbClient = pymongo.MongoClient(host, port)
+
+    def dl_bar_daily_from_sina(self, symbol):
+        print u'开始下载%s日行情' % symbol
+
         # 查询数据库中已有数据的最后日期
         cl = self.dbClient[DAILY_DB_NAME][symbol]
         cx = cl.find(sort=[('datetime', pymongo.DESCENDING)])
@@ -328,41 +345,98 @@ def downloadEquityDailyBarts(self, symbol):
             last = cx[0]
         else:
             last = ''
+
+        # 主力合约
+        if '0000' in symbol:
+            url = '%s%s' % (URL_SINA_HIST_D, symbol.replace('0000', '0'))
+        # 交易合约
+        else:
+            url = '%s%s' % (URL_SINA_HIST_D, symbol)
+
         # 开始下载数据
-        import tushare as ts
-        
-        if last:
-            start = last['date'][:4]+'-'+last['date'][4:6]+'-'+last['date'][6:]
-            
-        data = ts.get_k_data(symbol,start)
-        
-        if not data.empty:
+        html = urllib.urlopen(url).read().decode('gb2312')
+        data = json.loads(html)
+        data.reverse()
+
+        if data:
             # 创建datetime索引
-            self.dbClient[DAILY_DB_NAME][symbol].ensure_index([('datetime', pymongo.ASCENDING)], 
-                                                                unique=True)                
-            
-            for index, d in data.iterrows():
+            self.dbClient[DAILY_DB_NAME][symbol].ensure_index([('datetime', pymongo.ASCENDING)],
+                                                              unique=True)
+
+            for d in data:
                 bar = CtaBarData()
                 bar.vtSymbol = symbol
                 bar.symbol = symbol
                 try:
-                    bar.open = d.get('open')
-                    bar.high = d.get('high')
-                    bar.low = d.get('low')
-                    bar.close = d.get('close')
-                    bar.date = d.get('date').replace('-', '')
+                    # bar.exchange = DATAYES_TO_VT_EXCHANGE.get(d.get('exchangeCD', ''), '')
+                    bar.open = d[SINA_O]
+                    bar.high = d[SINA_H]
+                    bar.low = d[SINA_L]
+                    bar.close = d[SINA_C]
+                    bar.date = d[SINA_DATE].replace('-', '')
                     bar.time = ''
                     bar.datetime = datetime.strptime(bar.date, '%Y%m%d')
-                    bar.volume = d.get('volume')
+                    bar.volume = d[SINA_VOL]
+                    #bar.openInterest = d.get('openInt', 0)
                 except KeyError:
                     print d
-                
+
                 flt = {'datetime': bar.datetime}
-                self.dbClient[DAILY_DB_NAME][symbol].update_one(flt, {'$set':bar.__dict__}, upsert=True)            
-            
-            print u'%s下载完成' %symbol
+                self.dbClient[DAILY_DB_NAME][symbol].update_one(flt, {'$set': bar.__dict__}, upsert=True)
+
+                print u'%s下载完成' % symbol
         else:
-            print u'找不到合约%s' %symbol
+            print u'找不到合约%s' % symbol
+'''2017042300 Add by hetajen end'''
+
+def downloadEquityDailyBarts(self, symbol):
+    """
+    下载股票的日行情，symbol是股票代码
+    """
+    print u'开始下载%s日行情' %symbol
+
+    # 查询数据库中已有数据的最后日期
+    cl = self.dbClient[DAILY_DB_NAME][symbol]
+    cx = cl.find(sort=[('datetime', pymongo.DESCENDING)])
+    if cx.count():
+        last = cx[0]
+    else:
+        last = ''
+    # 开始下载数据
+    import tushare as ts
+
+    if last:
+        start = last['date'][:4]+'-'+last['date'][4:6]+'-'+last['date'][6:]
+
+    data = ts.get_k_data(symbol,start)
+
+    if not data.empty:
+        # 创建datetime索引
+        self.dbClient[DAILY_DB_NAME][symbol].ensure_index([('datetime', pymongo.ASCENDING)],
+                                                            unique=True)
+
+        for index, d in data.iterrows():
+            bar = CtaBarData()
+            bar.vtSymbol = symbol
+            bar.symbol = symbol
+            try:
+                bar.open = d.get('open')
+                bar.high = d.get('high')
+                bar.low = d.get('low')
+                bar.close = d.get('close')
+                bar.date = d.get('date').replace('-', '')
+                bar.time = ''
+                bar.datetime = datetime.strptime(bar.date, '%Y%m%d')
+                bar.volume = d.get('volume')
+            except KeyError:
+                print d
+
+            flt = {'datetime': bar.datetime}
+            self.dbClient[DAILY_DB_NAME][symbol].update_one(flt, {'$set':bar.__dict__}, upsert=True)
+
+        print u'%s下载完成' %symbol
+    else:
+        print u'找不到合约%s' %symbol
 #----------------------------------------------------------------------
 def loadMcCsv(fileName, dbName, symbol):
     """将Multicharts导出的csv格式的历史数据插入到Mongo数据库中"""
@@ -448,3 +522,10 @@ if __name__ == '__main__':
     loadMcCsv('IF0000_1min.csv', MINUTE_DB_NAME, 'IF0000')
     #导入通达信历史分钟数据
     #loadTdxCsv('CL8.csv', MINUTE_DB_NAME, 'c0000')
+
+    '''2017042300 Add by hetajen begin'''
+    e = HistoryDataEngine_SINA()
+    e.dl_bar_daily_from_sina('rb0000')
+    '''2017042300 Add by hetajen end'''
+
+
