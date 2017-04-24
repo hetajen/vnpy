@@ -8,12 +8,19 @@
 1. 作者不对交易盈利做任何保证，策略代码仅供参考
 2. 本策略需要用到talib，没有安装的用户请先参考www.vnpy.org上的教程安装
 3. 将IF0000_1min.csv用ctaHistoryData.py导入MongoDB后，直接运行本文件即可回测策略
+
+History
+<id>            <author>        <description>
+2017042401      hetajen         修改非同一目录下的文件的引用路径。消除import时找不到文件的报错。
+
 """
 
 from __future__ import division
 
-from ctaBase import *
-from ctaTemplate import CtaTemplate
+'''2017042401 Modified by hetajen begin'''
+from ctaAlgo.ctaBase import *
+from ctaAlgo.ctaTemplate import CtaTemplate
+'''2017042401 Modified by hetajen end'''
 
 import talib
 import numpy as np
@@ -265,36 +272,4 @@ class KkStrategy(CtaTemplate):
         self.orderList.append(self.buyOrderID)
         self.orderList.append(self.shortOrderID)
 
-
-if __name__ == '__main__':
-    # 提供直接双击回测的功能
-    # 导入PyQt4的包是为了保证matplotlib使用PyQt4而不是PySide，防止初始化出错
-    from ctaBacktesting import *
-    from PyQt4 import QtCore, QtGui
-    
-    # 创建回测引擎
-    engine = BacktestingEngine()
-    
-    # 设置引擎的回测模式为K线
-    engine.setBacktestingMode(engine.BAR_MODE)
-
-    # 设置回测用的数据起始日期
-    engine.setStartDate('20120101')
-    
-    # 设置产品相关参数
-    engine.setSlippage(0.2)     # 股指1跳
-    engine.setRate(0.3/10000)   # 万0.3
-    engine.setSize(300)         # 股指合约大小        
-    
-    # 设置使用的历史数据库
-    engine.setDatabase(MINUTE_DB_NAME, 'IF0000')
-    
-    # 在引擎中创建策略对象
-    d = {}
-    engine.initStrategy(KkStrategy, d)
-    
-    # 开始跑回测
-    engine.runBacktesting()
-    
-    # 显示回测结果
-    engine.showBacktestingResult()
+'''2017042401 Deleted by hetajen'''

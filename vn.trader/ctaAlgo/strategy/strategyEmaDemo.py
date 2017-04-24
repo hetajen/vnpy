@@ -9,12 +9,17 @@
 这些点是作者选择特意忽略不去实现，因此想实盘的朋友请自己多多研究CTA交易的一些细节，
 做到了然于胸后再去交易，对自己的money和时间负责。
 也希望社区能做出一个解决了以上潜在风险的Demo出来。
+
+History
+<id>            <author>        <description>
+2017042401      hetajen         修改非同一目录下的文件的引用路径。消除import时找不到文件的报错。
+
 """
 
-
-from ctaBase import *
-from ctaTemplate import CtaTemplate
-
+'''2017042401 Modified by hetajen begin'''
+from ctaAlgo.ctaBase import *
+from ctaAlgo.ctaTemplate import CtaTemplate
+'''2017042401 Modified by hetajen end'''
 
 ########################################################################
 class EmaDemoStrategy(CtaTemplate):
