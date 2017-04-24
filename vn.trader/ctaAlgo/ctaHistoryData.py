@@ -5,14 +5,12 @@
 1. 从通联数据下载历史行情的引擎
 2. 用来把MultiCharts导出的历史数据载入到MongoDB中用的函数
 3. 增加从通达信导出的历史数据载入到MongoDB中的函数
-"""
 
-'''
 History
 <id>            <author>        <description>
 2017042300      hetajen         新增：从sina财经json接口获取数据
 
-'''
+"""
 
 from datetime import datetime, timedelta
 import pymongo
@@ -519,7 +517,7 @@ if __name__ == '__main__':
     #e.downloadEquityDailyBarts('000001')
     
     # 这里将项目中包含的股指日内分钟线csv导入MongoDB，作者电脑耗时大约3分钟
-    loadMcCsv('IF0000_1min.csv', MINUTE_DB_NAME, 'IF0000')
+    # loadMcCsv('IF0000_1min.csv', MINUTE_DB_NAME, 'IF0000')
     #导入通达信历史分钟数据
     #loadTdxCsv('CL8.csv', MINUTE_DB_NAME, 'c0000')
 
