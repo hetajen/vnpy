@@ -2,9 +2,7 @@
 
 '''
 本文件中包含了CTA模块中用到的一些基础设置、类和常量等。
-'''
 
-'''
 History
 <id>            <author>        <description>
 2017042300      hetajen         新增：从sina财经json接口获取数据
