@@ -61,7 +61,7 @@ def main():
 '''2017042400 Add by hetajen begin'''
 def choose_user(argv):
     if len(argv) > 1:
-        path_src = os.path.join(os.path.abspath('.'), u'ctpGateway\\CTP_connect' + unicode(argv[int(argv[1]) + 1]))
+        path_src = os.path.join(os.path.abspath('.'), u'ctpGateway\\CTP_connect' + unicode(argv[1]))
     else:
         path_src = os.path.join(os.path.abspath('.'), u'ctpGateway\\CTP_connect_simnow.json')
 
