@@ -3,6 +3,11 @@
 '''
 本文件中包含的是CTA模块的回测引擎，回测引擎的API和CTA引擎一致，
 可以使用和实盘相同的代码进行回测。
+
+History
+<id>            <author>        <description>
+2017042402      hetajen         增加新文件vtBackTesting.py。解耦回测&优化的执行程序。
+
 '''
 from __future__ import division
 
@@ -897,39 +902,56 @@ def optimize(strategyClass, setting, targetName,
         targetValue = 0            
     return (str(setting), targetValue)    
 
+'''2017042402 Modified by hetajen begin'''
+import time
+from ctaAlgo.strategy.strategyAtrRsi import AtrRsiStrategy
+from ctaAlgo.ctaBase import MINUTE_DB_NAME
+
+def getEngine():
+    from ctaAlgo.ctaBacktesting import BacktestingEngine
+
+    engine = BacktestingEngine()
+    engine.setBacktestingMode(engine.BAR_MODE)  # 引擎的回测模式为K线
+    engine.setStartDate('20120101')  # 回测用的数据起始日期
+    engine.setSlippage(0.2)  # 股指1跳
+    engine.setRate(0.3 / 10000)  # 万0.3
+    engine.setSize(300)  # 股指合约大小
+    engine.setDatabase(MINUTE_DB_NAME, 'IF0000')
+
+    return engine
+
+def getParam(type=0):
+    if type == 0:
+        setting = {'atrLength': 11}
+    else:
+        from ctaAlgo.ctaBacktesting import OptimizationSetting
+        setting = OptimizationSetting()  # 新建一个优化任务设置对象
+        setting.setOptimizeTarget('capital')  # 设置优化排序的目标是策略净盈利
+        setting.addParameter('atrLength', 12, 20, 2)  # 增加第一个优化参数atrLength，起始11，结束12，步进1
+        setting.addParameter('atrMa', 20, 30, 5)  # 增加第二个优化参数atrMa，起始20，结束30，步进1
+        setting.addParameter('rsiLength', 5)  # 增加一个固定数值的参数
+    return setting
+
+def backTesting():
+    engine = getEngine()
+    setting = getParam()
+
+    engine.initStrategy(AtrRsiStrategy, setting)
+    engine.runBacktesting() # 开始跑回测
+    engine.showBacktestingResult() # 显示回测结果
+
+def optimize():
+    engine = getEngine()
+    setting = getParam(1)
+
+    engine.runOptimization(AtrRsiStrategy, setting) # 单进程优化。耗时：xxx秒
+    #engine.runParallelOptimization(AtrRsiStrategy, setting) # 多进程优化。耗时：xx秒
 
 if __name__ == '__main__':
-    # 以下内容是一段回测脚本的演示，用户可以根据自己的需求修改
-    # 建议使用ipython notebook或者spyder来做回测
-    # 同样可以在命令模式下进行回测（一行一行输入运行）
-    from strategy.strategyEmaDemo import *
-    
-    # 创建回测引擎
-    engine = BacktestingEngine()
-    
-    # 设置引擎的回测模式为K线
-    engine.setBacktestingMode(engine.BAR_MODE)
-
-    # 设置回测用的数据起始日期
-    engine.setStartDate('20110101')
-    
-    # 载入历史数据到引擎中
-    engine.setDatabase(MINUTE_DB_NAME, 'IF0000')
-    
-    # 设置产品相关参数
-    engine.setSlippage(0.2)     # 股指1跳
-    engine.setRate(0.3/10000)   # 万0.3
-    engine.setSize(300)         # 股指合约大小    
-    
-    # 在引擎中创建策略对象
-    engine.initStrategy(EmaDemoStrategy, {})
-    
-    # 开始跑回测
-    engine.runBacktesting()
-    
-    # 显示回测结果
-    # spyder或者ipython notebook中运行时，会弹出盈亏曲线图
-    # 直接在cmd中回测则只会打印一些回测数值
-    engine.showBacktestingResult()
+    start = time.time()
+    backTesting()
+    # optimize()
+    print u'耗时：%s' % (time.time() - start)  # 性能测试
+'''2017042402 Modified by hetajen end'''
     
     
