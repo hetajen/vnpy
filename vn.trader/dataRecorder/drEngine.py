@@ -4,6 +4,11 @@
 本文件中实现了行情数据记录引擎，用于汇总TICK数据，并生成K线插入数据库。
 
 使用DR_setting.json来配置需要收集的合约，以及主力合约代码。
+
+History
+<id>            <author>        <description>
+2017042500      hetajen         Tick数据不再保存到MongoDB。MongoDB只保存M1和D数据。
+
 '''
 
 import json
@@ -142,11 +147,15 @@ class DrEngine(object):
         
         # 更新Tick数据
         if vtSymbol in self.tickDict:
-            self.insertData(TICK_DB_NAME, vtSymbol, drTick)
+            '''2017042500 Deleted by hetajen begin'''
+            # self.insertData(TICK_DB_NAME, vtSymbol, drTick)
+            '''2017042500 Deleted by hetajen end'''
             
             if vtSymbol in self.activeSymbolDict:
                 activeSymbol = self.activeSymbolDict[vtSymbol]
-                self.insertData(TICK_DB_NAME, activeSymbol, drTick)
+                '''2017042500 Deleted by hetajen begin'''
+                # self.insertData(TICK_DB_NAME, activeSymbol, drTick)
+                '''2017042500 Deleted by hetajen end'''
             
             # 发出日志
             self.writeDrLog(u'记录Tick数据%s，时间:%s, last:%s, bid:%s, ask:%s' 

@@ -4,7 +4,7 @@
 History
 <id>            <author>        <description>
 2017042100      hetajen         自动执行CTA策略
-
+2017042501      hetajen         自动执行DataRecorder操作（保存M1数据到MongoDB）
 '''
 
 import psutil
@@ -35,7 +35,9 @@ class MainWindow(QtGui.QMainWindow):
         '''2017042100 Add by hetajen begin'''
         self.openCta()
         '''2017042100 Add by hetajen end'''
-        
+        '''2017042501 Add by hetajen begin'''
+        self.openDr()
+        '''2017042501 Add by hetajen end'''
     # ----------------------------------------------------------------------
     def initUi(self):
         """初始化界面"""
