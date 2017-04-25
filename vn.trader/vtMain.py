@@ -1,11 +1,5 @@
 # encoding: UTF-8
 
-'''
-History
-<id>            <author>        <description>
-2017042400      hetajen         根据bat脚本参数自动选择交易账户
-
-'''
 
 import sys
 import os
@@ -58,24 +52,5 @@ def main():
     # 在主线程中启动Qt事件循环
     sys.exit(app.exec_())
 
-'''2017042400 Add by hetajen begin'''
-def choose_user(argv):
-    if len(argv) > 1:
-        path_src = os.path.join(os.path.abspath('.'), u'ctpGateway\\CTP_connect' + unicode(argv[1]))
-    else:
-        path_src = os.path.join(os.path.abspath('.'), u'ctpGateway\\CTP_connect_simnow.json')
-
-    path_dst = os.path.join(os.path.abspath('.'), u'ctpGateway\\CTP_connect.json')
-    try:
-        with open(unicode(path_src), 'r') as src:
-            with open(unicode(path_dst), "w") as dst:
-                dst.write(src.read())
-    except IOError:
-        print "func(%s)'s Error: %s" % (sys._getframe().f_code.co_name, IOError)
-'''2017042400 Add by hetajen end'''
-
 if __name__ == '__main__':
-    '''2017042400 Add by hetajen begin'''
-    choose_user(sys.argv)
-    '''2017042400 Add by hetajen end'''
     main()
