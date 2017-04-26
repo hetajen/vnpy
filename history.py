@@ -14,4 +14,5 @@ History
 2017042402      hetajen         增加新文件vtBackTesting.py。解耦回测&优化的执行程序。
 2017042500      hetajen         Tick数据不再保存到MongoDB。MongoDB只保存M1和D数据。
 2017042501      hetajen         自动执行DataRecorder操作（保存M1数据到MongoDB）
+2017042600      hetajen         增加：获取日线Bar的接口
 '''
