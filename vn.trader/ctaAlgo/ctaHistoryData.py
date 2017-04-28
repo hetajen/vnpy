@@ -354,7 +354,7 @@ class HistoryDataEngine_SINA(object):
         # 开始下载数据
         html = urllib.urlopen(url).read().decode('gb2312')
         data = json.loads(html)
-        data.reverse()
+        # data.reverse()
 
         if data:
             # 创建datetime索引
